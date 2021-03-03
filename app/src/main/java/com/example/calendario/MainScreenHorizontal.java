@@ -90,38 +90,14 @@ public class MainScreenHorizontal extends Fragment implements PopupMenu.OnMenuIt
 
     }
 
-    ImageView config;
     HorizontalCalendar horizontalCalendar;
     Animation anim;
-    Switch vistaCalendario;
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        config = view.findViewById(R.id.config);
+
         anim = AnimationUtils.loadAnimation(getContext(),R.anim.rotation_anim);
-
-        vistaCalendario = view.findViewById(R.id.switch1);
-
-        vistaCalendario.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(!isChecked){
-                    Navigation.findNavController(getView()).navigate(R.id.mainScreenNormal);
-                }
-            }
-        });
-
-        config.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                config.startAnimation(anim);
-                PopupMenu popupMenu = new PopupMenu(getContext(),v);
-                popupMenu.setOnMenuItemClickListener(MainScreenHorizontal.this::onMenuItemClick);
-                popupMenu.inflate(R.menu.main_menu);
-                popupMenu.show();
-
-            }
-        });
 
 
         Calendar startDate = Calendar.getInstance();

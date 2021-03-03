@@ -22,5 +22,29 @@
         <action
             android:id="@+id/action_mainScreenNormal_to_mainScreenHorizontal"
             app:destination="@id/mainScreenHorizontal" />
+        <action
+            android:id="@+id/action_mainScreenNormal_to_eventos"
+            app:destination="@id/eventos" />
+    </fragment>
+    <fragment
+        android:id="@+id/eventos"
+        android:name="com.example.calendario.Eventos"
+        android:label="fragment_eventos"
+        tools:layout="@layout/fragment_eventos" >
+        <action
+            android:id="@+id/action_eventos_to_mainScreenNormal"
+            app:destination="@id/mainScreenNormal" />
+        <action
+            android:id="@+id/action_eventos_to_listasCompra"
+            app:destination="@id/listasCompra" />
+    </fragment>
+    <fragment
+        android:id="@+id/listasCompra"
+        android:name="com.example.calendario.ListasCompra"
+        android:label="fragment_listas_compra"
+        tools:layout="@layout/fragment_listas_compra" >
+        <action
+            android:id="@+id/action_listasCompra_to_eventos"
+            app:destination="@id/eventos" />
     </fragment>
 </navigation>

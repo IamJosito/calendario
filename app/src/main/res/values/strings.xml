@@ -8,4 +8,24 @@
 
     <string name="nueva_lista">Nueva lista de la compra</string>
     <string name="ver_lista">Ver listas de la compra</string>
+
+    <!-- Fragment Evento -->
+    <string name="eventos">Nuevo evento</string>
+    <string name="titulo_ev">Titulo</string>
+    <string name="descr_ev">Descripción</string>
+    <string name="hora_ev">Hora</string>
+
+    <string name="titulo_ev_hint">Nombre del titulo</string>
+    <string name="descr_ev_hint">Descripción para tú evento</string>
+
+    <string name="btnGuardar">Guardar</string>
+
+    <!-- Fragment Lista de la compra -->
+    <string name="titulo_lis">Lista de la compra</string>
+    <string name="productos">Productos</string>
+    <string name="prod_lis_hint">Nombre del producto</string>
+    <string name="cantidad_lis_hint">Cantidad de productos</string>
+    <string name="btnGuardarProd">Guardar producto</string>
+    <string name="btnEliminarProd">Eliminar producto</string>
+
 </resources>

@@ -5,29 +5,18 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.CalendarView;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.PopupMenu;
-import android.widget.Switch;
-
-import java.util.Calendar;
+import android.widget.NumberPicker;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link MainScreenNormal#newInstance} factory method to
+ * Use the {@link ListasCompra#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemClickListener{
+public class ListasCompra extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -38,7 +27,7 @@ public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemCl
     private String mParam1;
     private String mParam2;
 
-    public MainScreenNormal() {
+    public ListasCompra() {
         // Required empty public constructor
     }
 
@@ -48,11 +37,11 @@ public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemCl
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment MainScreenNormal.
+     * @return A new instance of fragment ListasCompra.
      */
     // TODO: Rename and change types and number of parameters
-    public static MainScreenNormal newInstance(String param1, String param2) {
-        MainScreenNormal fragment = new MainScreenNormal();
+    public static ListasCompra newInstance(String param1, String param2) {
+        ListasCompra fragment = new ListasCompra();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -73,45 +62,14 @@ public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemCl
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_main_screen_normal, container, false);
+        return inflater.inflate(R.layout.fragment_listas_compra, container, false);
     }
 
-
-    CalendarView calendario;
-    Calendar calendar;
-    String TAG = "TAG:::";
-    int ano, mes, dia;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        calendario = view.findViewById(R.id.calendarView2);
-        calendar = Calendar.getInstance();
-
-        ano = calendar.get(Calendar.YEAR);
-        mes = calendar.get(Calendar.MONTH);
-        dia = calendar.get(Calendar.DAY_OF_MONTH);
-
-        calendario.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @Override
-            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                ano = year;
-                mes = month;
-                dia = dayOfMonth;
-
-                Log.d(TAG, "FECHA: " + ano + " " + mes + " " + dia);
-
-            }
-        });
-
-
-        Log.d(TAG, "FECHA: " + ano + " " + mes + " " + dia);
-
-    }
-
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-
-        return true;
+        NumberPicker numberPicker = view.findViewById(R.id.numberPicker);
+        numberPicker.setMinValue(1);
+        numberPicker.setMaxValue(999);
     }
 }
