@@ -8,15 +8,17 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="calendar_bg_light_color">#ffffff</color>
     <color name="calendar_bg_dark_color">#192734</color>
 
-    <color name="calendar_fg_light_color">#000000</color>
     <color name="calendar_fg_dark_color">#ffffff</color>
 
     <color name="bg_dark_color">#38444d</color>
     <color name="selector_color">#2f84eb</color>
 
     <color name="red">#ff0000</color>
+
+    <color name="listTextColor">#263B4E</color>
+    <color name="listTextColor2">#1C2F40</color>
+    <color name="listTextColor3">#375A7A</color>
 
 </resources>

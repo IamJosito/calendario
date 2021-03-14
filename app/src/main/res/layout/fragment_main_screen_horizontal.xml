@@ -5,8 +5,8 @@
     android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainScreenHorizontal"
-    android:background="@color/bg_dark_color">
+    android:background="@color/bg_dark_color"
+    tools:context=".MainScreenHorizontal">
 
         <devs.mulham.horizontalcalendar.HorizontalCalendarView
             android:id="@+id/calendarView"
@@ -21,6 +21,7 @@
             app:textColorSelected="@color/calendar_fg_dark_color" />
 
         <ScrollView
+            android:id="@+id/scrollView4"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -29,9 +30,121 @@
             app:layout_constraintTop_toBottomOf="@+id/calendarView">
 
                 <LinearLayout
+                    android:id="@+id/verEventos"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical" />
         </ScrollView>
+
+        <TextView
+            android:id="@+id/viewShadow"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:alpha="0"
+            android:background="#000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/datosEventos"
+            android:layout_width="325dp"
+            android:layout_height="434dp"
+            android:background="@color/calendar_bg_dark_color"
+            app:layout_constraintBottom_toBottomOf="@+id/scrollView4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/calendarView">
+
+                <androidx.core.widget.NestedScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
+
+                                <EditText
+                                    android:id="@+id/etTitulo"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="44dp"
+                                    android:backgroundTint="@color/white"
+                                    android:ems="10"
+                                    android:fontFamily="@font/average_sans"
+                                    android:hint="@string/titulo_ev_hint"
+                                    android:inputType="textPersonName"
+                                    android:textColor="@color/calendar_fg_dark_color"
+                                    android:textColorHint="@android:color/darker_gray"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintHorizontal_bias="0.494"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <EditText
+                                    android:id="@+id/etDescripcion"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="36dp"
+                                    android:backgroundTint="@color/white"
+                                    android:ems="10"
+                                    android:fontFamily="@font/average_sans"
+                                    android:hint="@string/descr_ev"
+                                    android:inputType="textMultiLine"
+                                    android:textColor="@color/calendar_fg_dark_color"
+                                    android:textColorHint="@android:color/darker_gray"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintHorizontal_bias="0.494"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/etTitulo" />
+
+                                <EditText
+                                    android:id="@+id/etFecha"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="36dp"
+                                    android:backgroundTint="@color/white"
+                                    android:ems="10"
+                                    android:fontFamily="@font/average_sans"
+                                    android:hint="@string/hora_ev_hint"
+                                    android:inputType="date"
+                                    android:textColor="@color/calendar_fg_dark_color"
+                                    android:textColorHint="@android:color/darker_gray"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintHorizontal_bias="0.494"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/etDescripcion" />
+
+                                <Button
+                                    android:id="@+id/cancelar"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="32dp"
+                                    android:layout_marginTop="32dp"
+                                    android:backgroundTint="#C13434"
+                                    android:text="@string/cancelar"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/etFecha" />
+
+                                <Button
+                                    android:id="@+id/modificar"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="28dp"
+                                    android:layout_marginTop="32dp"
+                                    android:backgroundTint="#72C34F"
+                                    android:text="@string/modificar"
+                                    app:layout_constraintStart_toEndOf="@+id/cancelar"
+                                    app:layout_constraintTop_toBottomOf="@+id/etFecha" />
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.core.widget.NestedScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

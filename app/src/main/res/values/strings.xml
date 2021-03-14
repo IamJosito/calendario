@@ -14,11 +14,14 @@
     <string name="titulo_ev">Titulo</string>
     <string name="descr_ev">Descripción</string>
     <string name="hora_ev">Hora</string>
-
     <string name="titulo_ev_hint">Nombre del titulo</string>
     <string name="descr_ev_hint">Descripción para tú evento</string>
-
+    <string name="hora_ev_hint">YY-MM-DD HH:MM</string>
     <string name="btnGuardar">Guardar</string>
+    <string name="modificar">Modificar</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="ver_todos">Ver todos los eventos</string>
+    <string name="eliminar_todos">Eliminar todos</string>
 
     <!-- Fragment Lista de la compra -->
     <string name="titulo_lis">Lista de la compra</string>
@@ -27,5 +30,12 @@
     <string name="cantidad_lis_hint">Cantidad de productos</string>
     <string name="btnGuardarProd">Guardar producto</string>
     <string name="btnEliminarProd">Eliminar producto</string>
+    <string name="btnEliminarTodosProd">Eliminar todos los productos</string>
+
+    <!-- Multiples tags para los txtView de los eventos-->
+    <item type="id" name="id"/>
+    <item type="id" name="titulo"/>
+    <item type="id" name="fecha"/>
+    <item type="id" name="descripcion"/>
 
 </resources>
