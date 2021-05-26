@@ -21,4 +21,6 @@
     <color name="listTextColor2">#1C2F40</color>
     <color name="listTextColor3">#375A7A</color>
 
+    <color name="black_background">#1E1E1E</color>
+
 </resources>

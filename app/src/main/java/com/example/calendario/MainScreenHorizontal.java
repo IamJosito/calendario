@@ -1,61 +1,46 @@
 package com.example.calendario;
 
 import android.app.DatePickerDialog;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.TimePickerDialog;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.media.RingtoneManager;
-import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
-
 import android.os.Handler;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.CalendarView;
-import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
-import android.widget.Switch;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.navigation.NavController;
 
 import com.github.johnpersano.supertoasts.library.Style;
 import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.github.johnpersano.supertoasts.library.utils.PaletteUtils;
 
-import org.w3c.dom.Text;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Objects;
 
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.HorizontalCalendarView;
@@ -72,10 +57,7 @@ public class MainScreenHorizontal extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private LinearLayout layout;
 
     public MainScreenHorizontal() {
         // Required empty public constructor
@@ -104,15 +86,23 @@ public class MainScreenHorizontal extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            // TODO: Rename and change types of parameters
+            String mParam1 = getArguments().getString(ARG_PARAM1);
+            String mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        calendar = Calendar.getInstance();
+        ano = calendar.get(Calendar.YEAR);
+        mes = calendar.get(Calendar.MONTH) + 1;
+        dia = calendar.get(Calendar.DAY_OF_MONTH);
+        this.layout = getActivity().findViewById(R.id.main_activity);
+        checkBackground(layout);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
         return inflater.inflate(R.layout.fragment_main_screen_horizontal, container, false);
     }
 
@@ -127,18 +117,18 @@ public class MainScreenHorizontal extends Fragment {
     HorizontalCalendar horizontalCalendar;
     LinearLayout verEventos;
     ConstraintLayout datosEventos;
-    int ano, mes, dia, idTxt;
+    int ano = 0, mes = 0, dia = 0, idTxt;
     Calendar calendar;
     private final String TAG = "TAG:::";
     TextView viewShadow;
     EditText etTituloEv, etFechaEv, etDescEv;
     Button modificar, cancelar;
+    Date date = new Date();
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        calendar = Calendar.getInstance();
 
         datosEventos = view.findViewById(R.id.datosEventos);
         viewShadow = view.findViewById(R.id.viewShadow);
@@ -152,17 +142,9 @@ public class MainScreenHorizontal extends Fragment {
 
         datosEventos.setVisibility(View.INVISIBLE);
 
-        ano = calendar.get(Calendar.YEAR);
-        mes = calendar.get(Calendar.MONTH) + 1;
-        dia = calendar.get(Calendar.DAY_OF_MONTH);
 
         etFechaEv.setInputType(InputType.TYPE_NULL);
-        etFechaEv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDateTimeDialog(etFechaEv);
-            }
-        });
+        etFechaEv.setOnClickListener(v -> showDateTimeDialog(etFechaEv));
 
         this.cargareEventos();
         Calendar startDate = Calendar.getInstance();
@@ -183,29 +165,29 @@ public class MainScreenHorizontal extends Fragment {
                 ano = date.get(Calendar.YEAR);
                 mes = date.get(Calendar.MONTH) + 1;
                 dia = date.get(Calendar.DAY_OF_MONTH);
-
+                getActivity().getIntent().putExtra("horizontalDay", dia);
+                getActivity().getIntent().putExtra("horizontalMonth", mes);
+                getActivity().getIntent().putExtra("horizontalYear", ano);
+                checkBackground(layout);
                 MainScreenHorizontal.this.cargareEventos();
             }
         });
 
-        cancelar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                datosEventos.setVisibility(View.INVISIBLE);
-                viewShadow.setAlpha(0f);
-            }
+        cancelar.setOnClickListener(v -> {
+            datosEventos.setVisibility(View.INVISIBLE);
+            viewShadow.setAlpha(0f);
         });
 
         modificar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 SQLite sqLite = new SQLite(getContext(), "calendario", null, 1);
-                if(!etTituloEv.getText().toString().isEmpty() || !etDescEv.getText().toString().isEmpty() || !etFechaEv.getText().toString().isEmpty()){
+                if (!etTituloEv.getText().toString().isEmpty() || !etDescEv.getText().toString().isEmpty() || !etFechaEv.getText().toString().isEmpty()) {
 
                     String titulo = etTituloEv.getText().toString();
                     String fecha = etFechaEv.getText().toString();
                     String descripcion = etDescEv.getText().toString();
-                    sqLite.modificarEvento(idTxt,titulo, fecha, descripcion);
+                    sqLite.modificarEvento(idTxt, titulo, fecha, descripcion);
 
                     etTituloEv.setText("");
                     etDescEv.setText("");
@@ -223,7 +205,7 @@ public class MainScreenHorizontal extends Fragment {
 
                     MainScreenHorizontal.this.cargareEventos();
 
-                }else{
+                } else {
                     SuperActivityToast.create(getActivity(), new Style(), Style.TYPE_STANDARD)
                             .setText("Debes rellenar todos los campos.")
                             .setDuration(Style.DURATION_VERY_SHORT)
@@ -237,50 +219,50 @@ public class MainScreenHorizontal extends Fragment {
 
     }
 
-    private void cargareEventos(){
+    private void cargareEventos() {
         SQLite sqLite = new SQLite(getContext(), "calendario", null, 1);
         verEventos = getView().findViewById(R.id.verEventos);
         verEventos.removeAllViews();
         SQLiteDatabase db = sqLite.getWritableDatabase();
-        Cursor filasEventos = db.rawQuery("SELECT * FROM eventos WHERE fecha LIKE '"+ ano + "-"+ mes + "-"+ dia + "%'",null);
+        Cursor filasEventos = db.rawQuery("SELECT * FROM eventos WHERE fecha LIKE '" + ano + "-" + mes + "-" + dia + "%'", null);
 
         int calcOdd = 0;
-        while (filasEventos.moveToNext()){
+        while (filasEventos.moveToNext()) {
             //Una vez agregado, creamos unos parametros para asignarselos al imageView
             LinearLayout.LayoutParams lpTxt = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             //Ponemos el margen, usamos el | (int) ((int) X*getContext().getResources().getDisplayMetrics().density) | para convertilos a PX y podamos hacerlo bien
-            lpTxt.setMargins(0, 0, 0 , 0);
-
+            lpTxt.setMargins(0, 0, 0, 0);
 
             TextView txt = new TextView(getContext());
 
             txt.setLayoutParams(lpTxt);
             txt.setText(filasEventos.getString(1) + " - " + filasEventos.getString(2).split(" ")[1]);
 
-            txt.setTag(R.id.id,filasEventos.getInt(0));
-            txt.setTag(R.id.titulo,filasEventos.getString(1));
-            txt.setTag(R.id.fecha,filasEventos.getString(2));
-            txt.setTag(R.id.descripcion,filasEventos.getString(3));
+            txt.setTag(R.id.id, filasEventos.getInt(0));
+            txt.setTag(R.id.titulo, filasEventos.getString(1));
+            txt.setTag(R.id.fecha, filasEventos.getString(2));
+            txt.setTag(R.id.descripcion, filasEventos.getString(3));
 
             txt.setTextColor(ContextCompat.getColor(getContext(), R.color.calendar_fg_dark_color));
             txt.setTextSize(24);
 
-            if(calcOdd%2 == 0){
-                txt.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.listTextColor));
-            }else{
-                txt.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.listTextColor2));
+            if (calcOdd % 2 == 0) {
+                txt.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.listTextColor));
+            } else {
+                txt.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.listTextColor2));
             }
             verEventos.post(new Runnable() {
                 @Override
                 public void run() {
-                    txt.setPadding(10,10,verEventos.getMeasuredWidth()-txt.getMeasuredWidth()-10,10);
+                    txt.setPadding(10, 10, verEventos.getMeasuredWidth() - txt.getMeasuredWidth() - 10, 10);
                 }
             });
 
             txt.setOnClickListener(new View.OnClickListener() {
-                String titulo = (String) txt.getTag(R.id.titulo);
-                String fecha = (String) txt.getTag(R.id.fecha);
-                String descripcion = (String) txt.getTag(R.id.descripcion);
+                final String titulo = (String) txt.getTag(R.id.titulo);
+                final String fecha = (String) txt.getTag(R.id.fecha);
+                final String descripcion = (String) txt.getTag(R.id.descripcion);
+
                 @Override
                 public void onClick(View v) {
                     idTxt = (int) txt.getTag(R.id.id);
@@ -300,7 +282,7 @@ public class MainScreenHorizontal extends Fragment {
                     DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            switch (which){
+                            switch (which) {
                                 case DialogInterface.BUTTON_POSITIVE:
                                     sqLite.borrarEvento(idTxt);
                                     MainScreenHorizontal.this.cargareEventos();
@@ -325,35 +307,67 @@ public class MainScreenHorizontal extends Fragment {
     }
 
     private void showDateTimeDialog(final EditText date_time_in) {
-        final Calendar calendar= Calendar.getInstance();
-        DatePickerDialog.OnDateSetListener dateSetListener=new DatePickerDialog.OnDateSetListener() {
+        final Calendar calendar = Calendar.getInstance();
+        DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                calendar.set(Calendar.YEAR,year);
-                calendar.set(Calendar.MONTH,month);
-                calendar.set(Calendar.DAY_OF_MONTH,dayOfMonth);
+                calendar.set(Calendar.YEAR, year);
+                calendar.set(Calendar.MONTH, month);
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-                TimePickerDialog.OnTimeSetListener timeSetListener=new TimePickerDialog.OnTimeSetListener() {
+                TimePickerDialog.OnTimeSetListener timeSetListener = new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        calendar.set(Calendar.HOUR_OF_DAY,hourOfDay);
-                        calendar.set(Calendar.MINUTE,minute);
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
 
-                        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-M-d HH:mm");
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-M-d HH:mm");
 
                         date_time_in.setText(simpleDateFormat.format(calendar.getTime()));
                     }
                 };
-
-                new TimePickerDialog(getContext(),timeSetListener,calendar.get(Calendar.HOUR_OF_DAY),calendar.get(Calendar.MINUTE),false).show();
+                new TimePickerDialog(getContext(), timeSetListener, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false).show();
             }
         };
-
-        new DatePickerDialog(getContext(),dateSetListener,calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH)).show();
-
+        new DatePickerDialog(getContext(), dateSetListener, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    dia = requireActivity().getIntent().getIntExtra("horizontalDay", 0);
+                    mes = requireActivity().getIntent().getIntExtra("horizontalMonth", 0);
+                    ano = requireActivity().getIntent().getIntExtra("horizontalYear", 0);
+
+                    Log.d(TAG, "setUserVisibleHint: " + dia + mes + ano);
+                    Calendar calendarSetter = Calendar.getInstance();
+                    calendarSetter.set(Calendar.YEAR, ano);
+                    calendarSetter.set(Calendar.MONTH, mes);
+                    calendarSetter.set(Calendar.DAY_OF_MONTH, dia);
 
 
+                    horizontalCalendar.goToday(false);
+
+                    getActivity().getIntent().putExtra("horizontalDay", Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+                    getActivity().getIntent().putExtra("horizontalMonth", Calendar.getInstance().get(Calendar.MONTH));
+                    getActivity().getIntent().putExtra("horizontalYear", Calendar.getInstance().get(Calendar.YEAR));
+
+                }
+            }, 10);
+
+
+        }
+    }
+
+    private void checkBackground(LinearLayout layout) {
+        if (mes >= 2 && mes < 5) layout.setBackgroundResource(R.drawable.sprin_screen);
+        if (mes >= 5 && mes < 8) layout.setBackgroundResource(R.drawable.summer_screen);
+        if (mes >= 8 && mes <= 11) layout.setBackgroundResource(R.drawable.autumn_screen);
+        if (mes >= 0 && mes < 2) layout.setBackgroundResource(R.drawable.winter_screen);
+    }
 
 }

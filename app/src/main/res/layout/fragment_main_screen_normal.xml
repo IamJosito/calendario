@@ -5,14 +5,15 @@
     android:id="@+id/frameLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainScreenNormal"
-    android:background="@color/bg_dark_color">
+    android:background="@android:color/transparent"
+    tools:context=".MainScreenNormal">
 
     <CalendarView
 
         android:id="@+id/calendarView2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:background="@color/black_background"
         android:dateTextAppearance="@style/CalenderViewDateCustomText"
         android:theme="@style/CalenderViewCustom"
         android:weekDayTextAppearance="@style/CalenderViewWeekCustomText"
@@ -25,6 +26,7 @@
         android:id="@+id/scrollView5"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

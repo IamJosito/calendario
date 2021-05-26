@@ -47,16 +47,7 @@ import java.util.Calendar;
  * Use the {@link MainScreenNormal#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemClickListener{
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemClickListener {
 
     public MainScreenNormal() {
         // Required empty public constructor
@@ -66,16 +57,14 @@ public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemCl
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment MainScreenNormal.
      */
-    // TODO: Rename and change types and number of parameters
-    public static MainScreenNormal newInstance(String param1, String param2) {
+    public static MainScreenNormal newInstance(int dia, int mes, int ano) {
         MainScreenNormal fragment = new MainScreenNormal();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putInt("month", mes);
+        args.putInt("day", dia);
+        args.putInt("year", ano);
         fragment.setArguments(args);
         return fragment;
     }
@@ -83,16 +72,20 @@ public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemCl
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        bundle = savedInstanceState;
+        calendar = Calendar.getInstance();
+        ano = calendar.get(Calendar.YEAR);
+        mes = calendar.get(Calendar.MONTH) + 1;
+        dia = calendar.get(Calendar.DAY_OF_MONTH);
+        this.layout = getActivity().findViewById(R.id.main_activity);
+        checkBackground(layout);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
         return inflater.inflate(R.layout.fragment_main_screen_normal, container, false);
     }
 
@@ -107,12 +100,16 @@ public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemCl
     Button modificar, cancelar;
     TextView viewShadow;
     ConstraintLayout datosEventos;
+    Bundle bundle = null;
+
+    LinearLayout layout;
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
         calendario = view.findViewById(R.id.calendarView2);
-        calendar = Calendar.getInstance();
 
         datosEventos = view.findViewById(R.id.datosEventos);
         viewShadow = view.findViewById(R.id.viewShadow);
@@ -125,10 +122,6 @@ public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemCl
         cancelar = view.findViewById(R.id.cancelar);
 
         datosEventos.setVisibility(View.INVISIBLE);
-
-        ano = calendar.get(Calendar.YEAR);
-        mes = calendar.get(Calendar.MONTH) + 1;
-        dia = calendar.get(Calendar.DAY_OF_MONTH);
 
         etFechaEv.setInputType(InputType.TYPE_NULL);
         etFechaEv.setOnClickListener(new View.OnClickListener() {
@@ -146,7 +139,7 @@ public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemCl
                 ano = year;
                 mes = month + 1;
                 dia = dayOfMonth;
-
+                checkBackground(layout);
                 Log.d(TAG, "FECHA: " + ano + " " + mes + " " + dia);
                 MainScreenNormal.this.cargareEventos();
 
@@ -165,12 +158,12 @@ public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemCl
             @Override
             public void onClick(View v) {
                 SQLite sqLite = new SQLite(getContext(), "calendario", null, 1);
-                if(!etTituloEv.getText().toString().isEmpty() || !etDescEv.getText().toString().isEmpty() || !etFechaEv.getText().toString().isEmpty()){
+                if (!etTituloEv.getText().toString().isEmpty() || !etDescEv.getText().toString().isEmpty() || !etFechaEv.getText().toString().isEmpty()) {
 
                     String titulo = etTituloEv.getText().toString();
                     String fecha = etFechaEv.getText().toString();
                     String descripcion = etDescEv.getText().toString();
-                    sqLite.modificarEvento(idTxt,titulo, fecha, descripcion);
+                    sqLite.modificarEvento(idTxt, titulo, fecha, descripcion);
 
                     etTituloEv.setText("");
                     etDescEv.setText("");
@@ -188,7 +181,7 @@ public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemCl
 
                     MainScreenNormal.this.cargareEventos();
 
-                }else{
+                } else {
                     SuperActivityToast.create(getActivity(), new Style(), Style.TYPE_STANDARD)
                             .setText("Debes rellenar todos los campos.")
                             .setDuration(Style.DURATION_VERY_SHORT)
@@ -200,8 +193,6 @@ public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemCl
         });
 
 
-
-
     }
 
     @Override
@@ -210,43 +201,42 @@ public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemCl
         return true;
     }
 
-    private void cargareEventos(){
+    private void cargareEventos() {
         SQLite sqLite = new SQLite(getContext(), "calendario", null, 1);
         verEventos = getView().findViewById(R.id.verEventos);
         verEventos.removeAllViews();
         SQLiteDatabase db = sqLite.getWritableDatabase();
-        Cursor filasEventos = db.rawQuery("SELECT * FROM eventos WHERE fecha LIKE '"+ ano + "-"+ mes + "-"+ dia + "%'",null);
+        Cursor filasEventos = db.rawQuery("SELECT * FROM eventos WHERE fecha LIKE '" + ano + "-" + mes + "-" + dia + "%'", null);
 
         int calcOdd = 0;
-        while (filasEventos.moveToNext()){
+        while (filasEventos.moveToNext()) {
             //Una vez agregado, creamos unos parametros para asignarselos al imageView
             LinearLayout.LayoutParams lpTxt = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             //Ponemos el margen, usamos el | (int) ((int) X*getContext().getResources().getDisplayMetrics().density) | para convertilos a PX y podamos hacerlo bien
-            lpTxt.setMargins(0, 0, 0 , 0);
-
+            lpTxt.setMargins(0, 0, 0, 0);
 
             TextView txt = new TextView(getContext());
 
             txt.setLayoutParams(lpTxt);
             txt.setText(filasEventos.getString(1) + " - " + filasEventos.getString(2).split(" ")[1]);
 
-            txt.setTag(R.id.id,filasEventos.getInt(0));
-            txt.setTag(R.id.titulo,filasEventos.getString(1));
-            txt.setTag(R.id.fecha,filasEventos.getString(2));
-            txt.setTag(R.id.descripcion,filasEventos.getString(3));
+            txt.setTag(R.id.id, filasEventos.getInt(0));
+            txt.setTag(R.id.titulo, filasEventos.getString(1));
+            txt.setTag(R.id.fecha, filasEventos.getString(2));
+            txt.setTag(R.id.descripcion, filasEventos.getString(3));
 
             txt.setTextColor(ContextCompat.getColor(getContext(), R.color.calendar_fg_dark_color));
             txt.setTextSize(24);
 
-            if(calcOdd%2 == 0){
-                txt.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.listTextColor));
-            }else{
-                txt.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.listTextColor2));
+            if (calcOdd % 2 == 0) {
+                txt.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.listTextColor));
+            } else {
+                txt.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.listTextColor2));
             }
             verEventos.post(new Runnable() {
                 @Override
                 public void run() {
-                    txt.setPadding(10,10,verEventos.getMeasuredWidth()-txt.getMeasuredWidth()-10,10);
+                    txt.setPadding(10, 10, verEventos.getMeasuredWidth() - txt.getMeasuredWidth() - 10, 10);
                 }
             });
 
@@ -254,6 +244,7 @@ public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemCl
                 String titulo = (String) txt.getTag(R.id.titulo);
                 String fecha = (String) txt.getTag(R.id.fecha);
                 String descripcion = (String) txt.getTag(R.id.descripcion);
+
                 @Override
                 public void onClick(View v) {
                     idTxt = (int) txt.getTag(R.id.id);
@@ -273,7 +264,7 @@ public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemCl
                     DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            switch (which){
+                            switch (which) {
                                 case DialogInterface.BUTTON_POSITIVE:
                                     sqLite.borrarEvento(idTxt);
                                     MainScreenNormal.this.cargareEventos();
@@ -298,31 +289,55 @@ public class MainScreenNormal extends Fragment implements PopupMenu.OnMenuItemCl
     }
 
     private void showDateTimeDialog(final EditText date_time_in) {
-        final Calendar calendar= Calendar.getInstance();
-        DatePickerDialog.OnDateSetListener dateSetListener=new DatePickerDialog.OnDateSetListener() {
+        final Calendar calendar = Calendar.getInstance();
+        DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                calendar.set(Calendar.YEAR,year);
-                calendar.set(Calendar.MONTH,month);
-                calendar.set(Calendar.DAY_OF_MONTH,dayOfMonth);
+                calendar.set(Calendar.YEAR, year);
+                calendar.set(Calendar.MONTH, month);
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-                TimePickerDialog.OnTimeSetListener timeSetListener=new TimePickerDialog.OnTimeSetListener() {
+                TimePickerDialog.OnTimeSetListener timeSetListener = new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        calendar.set(Calendar.HOUR_OF_DAY,hourOfDay);
-                        calendar.set(Calendar.MINUTE,minute);
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
 
-                        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-M-d HH:mm");
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-M-d HH:mm");
 
                         date_time_in.setText(simpleDateFormat.format(calendar.getTime()));
                     }
                 };
 
-                new TimePickerDialog(getContext(),timeSetListener,calendar.get(Calendar.HOUR_OF_DAY),calendar.get(Calendar.MINUTE),false).show();
+                new TimePickerDialog(getContext(), timeSetListener, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false).show();
             }
         };
 
-        new DatePickerDialog(getContext(),dateSetListener,calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH)).show();
+        new DatePickerDialog(getContext(), dateSetListener, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
 
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser){
+            dia = getActivity().getIntent().getIntExtra("normalDay",0);
+            mes = getActivity().getIntent().getIntExtra("normalMonth",0);
+            ano = getActivity().getIntent().getIntExtra("normalYear",0);
+
+            Log.d(TAG, "setUserVisibleHint: " + dia + mes + ano);
+            Calendar calendarSetter = Calendar.getInstance();
+            calendarSetter.set(Calendar.YEAR, ano);
+            calendarSetter.set(Calendar.MONTH, mes-1);
+            calendarSetter.set(Calendar.DAY_OF_MONTH, dia);
+
+            calendario.setDate(calendarSetter.getTimeInMillis(), true, true);
+        }
+    }
+    private void checkBackground(LinearLayout layout) {
+        if (mes >= 2 && mes < 5) layout.setBackgroundResource(R.drawable.sprin_screen);
+        if (mes >= 5 && mes < 8) layout.setBackgroundResource(R.drawable.summer_screen);
+        if (mes >= 8 && mes <= 11) layout.setBackgroundResource(R.drawable.autumn_screen);
+        if (mes >= 0 && mes < 2) layout.setBackgroundResource(R.drawable.winter_screen);
     }
 }

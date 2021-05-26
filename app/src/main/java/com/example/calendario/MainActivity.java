@@ -1,32 +1,35 @@
 package com.example.calendario;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
+import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.PorterDuff;
-import android.media.RingtoneManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.material.tabs.TabLayout;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "TAG:::";
     TabLayout tableLayout;
     ViewPager viewPager;
+    int yearHorizontal = 0, monthHorizontal = 0, dayHorizontal = 0;
+    int yearNormal, monthNormal, dayNormal;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,26 +46,84 @@ public class MainActivity extends AppCompatActivity {
         arrayList.add("Lista de la compra");
         arrayList.add("Opciones");
 
-        prepareViewPager(viewPager,arrayList);
+        Log.d(TAG, "EL MES ES: " + monthHorizontal);
+
+        prepareViewPager(viewPager, arrayList);
 
         tableLayout.setupWithViewPager(viewPager);
 
+        tableLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 0) {
+                    getIntent().putExtra("horizontalYear", yearNormal);
+                    getIntent().putExtra("horizontalMonth", monthNormal);
+                    getIntent().putExtra("horizontalDay", dayNormal);
+                }
+
+                if (tab.getPosition() == 1) {
+                    getIntent().putExtra("normalYear", yearHorizontal);
+                    getIntent().putExtra("normalMonth", monthHorizontal);
+                    getIntent().putExtra("normalDay", dayHorizontal);
+                }
+
+                getWindow().getDecorView().setBackgroundResource(android.R.color.white);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 0) {
+                    yearHorizontal = getIntent().getIntExtra("horizontalYear", 0);
+                    dayHorizontal = getIntent().getIntExtra("horizontalDay", 0);
+                    monthHorizontal = getIntent().getIntExtra("horizontalMonth", 0);
+                }
+
+                if (tab.getPosition() == 1) {
+                    yearNormal = getIntent().getIntExtra("normalYear", 0);
+                    dayNormal = getIntent().getIntExtra("normalDay", 0);
+                    monthNormal = getIntent().getIntExtra("normalMonth", 0);
+                    Log.d(TAG, "onTabUnselected: " + yearNormal);
+                }
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     private void prepareViewPager(ViewPager viewPager, ArrayList<String> arrayList) {
         MainAdapter adapter = new MainAdapter(getSupportFragmentManager());
-
 
         MainScreenHorizontal mainScreenHorizontal = new MainScreenHorizontal();
         MainScreenNormal mainScreenNormal = new MainScreenNormal();
         Eventos eventos = new Eventos();
         ListasCompra lista = new ListasCompra();
 
-        adapter.addFragment(mainScreenHorizontal,arrayList.get(0));
-        adapter.addFragment(mainScreenNormal,arrayList.get(1));
-        adapter.addFragment(eventos,arrayList.get(2));
-        adapter.addFragment(lista,arrayList.get(3));
-
+        adapter.addFragment(mainScreenHorizontal, arrayList.get(0));
+        adapter.addFragment(mainScreenNormal, arrayList.get(1));
+        adapter.addFragment(eventos, arrayList.get(2));
+        adapter.addFragment(lista, arrayList.get(3));
 
         viewPager.setAdapter(adapter);
 
@@ -71,6 +132,8 @@ public class MainActivity extends AppCompatActivity {
 
     int ano, mes, dia;
     Calendar calendar;
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onStop() {
         super.onStop();
@@ -82,47 +145,26 @@ public class MainActivity extends AppCompatActivity {
 
         SQLite sqLite = new SQLite(getApplicationContext(), "calendario", null, 1);
         SQLiteDatabase db = sqLite.getWritableDatabase();
-        Cursor filasEventos = db.rawQuery("SELECT * FROM eventos WHERE fecha LIKE '"+ ano + "-"+ mes + "-"+ dia + "%'",null);
-        String eventosHoy = "";
 
-        int numEventos = 0;
-        while(filasEventos.moveToNext()){
-            eventosHoy += filasEventos.getString(1) + " ";
-            eventosHoy += filasEventos.getString(2).split(" ")[1];
-            numEventos++;
-            if(numEventos < filasEventos.getCount()){
-                eventosHoy +=", ";
-            }
+        try {
+            Cursor todosEventos = db.rawQuery("SELECT * FROM eventos", null);
+            todosEventos.moveToFirst();
+            String fecha = todosEventos.getString(2);
+            System.out.println(fecha);
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+            Date fecha1 = format.parse(fecha);
+            Date fecha2 = new Date();
+
+            long differenceBtwDates = fecha1.getTime() - fecha2.getTime();
+            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+            Intent intent = new Intent(MainActivity.this, Reminder.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent, 0);
+
+            alarmManager.set(AlarmManager.RTC_WAKEUP, differenceBtwDates, pendingIntent);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        if(!eventosHoy.equals("")){
-            int reqCode = 1;
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            showNotification(this, "Eventos hoy", "Tienes: " + eventosHoy, intent, reqCode);
-        }
-
-    }
-
-    public void showNotification(Context context, String title, String message, Intent intent, int reqCode) {
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, reqCode, intent, PendingIntent.FLAG_ONE_SHOT);
-        String CHANNEL_ID = "channel_name";// The id of the channel.
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_background)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setAutoCancel(true)
-                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                .setContentIntent(pendingIntent)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(message));
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Channel Name";// The user-visible name of the channel.
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
-            notificationManager.createNotificationChannel(mChannel);
-        }
-        notificationManager.notify(reqCode, notificationBuilder.build()); // 0 is the request code, it should be unique id
-
-        Log.d("showNotification", "showNotification: " + reqCode);
     }
 }
